@@ -45,6 +45,7 @@ function () {
    *
    * @param {string} key
    * @returns {*}
+   * @description インスタンスのnamespace階層配下にてkeyに対応する値を取得する
    */
   proto.getItem = function getItem(key){
     var fullKey = key2FullKey.call(this,key);
@@ -57,6 +58,7 @@ function () {
    *
    * @param {string} key
    * @param {*} data JSON化可能な任意の型のデータ
+   * @description インスタンスのnamespace階層配下にてkeyに対応する値を設定する。生のWebStorageと違い文字列型以外も扱える。
    */
   proto.setItem = function setItem(key,data){
     var fullKey = key2FullKey.call(this,key);
@@ -72,6 +74,7 @@ function () {
    * @function
    *
    * @param {string} key
+   * @description インスタンスのnamespace階層配下にてkeyに対応する値を削除する。
    */
   proto.removeItem = function removeItem(key) {
     var fullKey = key2FullKey.call(this,key);
