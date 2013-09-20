@@ -2,7 +2,7 @@
  * NamespacedWebStorage.js
  *
  * https://github.com/monjudoh/NamespacedWebStorage.js
- * version: 0.0.1
+ * version: 0.0.2
  *
  * Copyright (c) 2013 monjudoh
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -10,7 +10,7 @@
  */
 /**
  * @module NamespacedWebStorage
- * @version 0.0.1
+ * @version 0.0.2
  * @author monjudoh
  * @copyright (c) 2013 monjudoh<br/>
  * Dual licensed under the MIT (MIT-LICENSE.txt)<br/>
@@ -118,7 +118,7 @@ function () {
     var namespaces4truncate = namespaces.slice(number);
     namespaces4truncate.forEach(function(namespace){
       namespace2keys[namespace].forEach(function(key){
-        delete this.storage[key];
+        delete storage[key];
       });
     });
   };
