@@ -26,6 +26,27 @@ function () {
     return this.namespaces.join('.') + '.' + key;
   }
   /**
+   * @function hasItem
+   * @memberOf NamespacedWebStorage#
+   *
+   * @param {string} key
+   * @returns {boolean} 値が存在すればtrue
+   * @description <pre>インスタンスのnamespace階層配下にてkeyに対応する値が存在するか調べる。
+   * Storageには存在しないmethodでkey in storageに相当する。
+   * backendのstorageが
+   * Storageの場合は実装としてkey in storageを使う。
+   * Storageでない場合は同様のhasItem methodがあるものとしてその結果を使う。
+   * </pre>
+   */
+  proto.hasItem = function hasItem(key){
+    var fullKey = key2FullKey.call(this,key);
+    if (this.storage instanceof Storage) {
+      return fullKey in this.storage;
+    } else {
+      return this.storage.hasItem(fullKey);
+    }
+  };
+  /**
    * @function getItem
    * @memberOf NamespacedWebStorage#
    *
