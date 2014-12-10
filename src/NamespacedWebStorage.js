@@ -26,9 +26,8 @@ function () {
     return this.namespaces.join('.') + '.' + key;
   }
   /**
-   * @name getItem
+   * @function getItem
    * @memberOf NamespacedWebStorage#
-   * @function
    *
    * @param {string} key
    * @returns {*}
@@ -39,9 +38,8 @@ function () {
     return JSON.parse((this.storage[fullKey] || '{}')).value;
   };
   /**
-   * @name setItem
+   * @function setItem
    * @memberOf NamespacedWebStorage#
-   * @function
    *
    * @param {string} key
    * @param {*} data JSON化可能な任意の型のデータ
@@ -56,9 +54,8 @@ function () {
     this.storage[fullKey] = json;
   };
   /**
-   * @name removeItem
+   * @function removeItem
    * @memberOf NamespacedWebStorage#
-   * @function
    *
    * @param {string} key
    * @description インスタンスのnamespace階層配下にてkeyに対応する値を削除する。
@@ -68,9 +65,8 @@ function () {
     delete this.storage[fullKey];
   };
   /**
-   * @name truncate
+   * @function truncate
    * @memberOf NamespacedWebStorage#
-   * @function
    *
    * @param {number} number 残す個数
    * @param {number=} level namespace階層。デフォルト値は1
