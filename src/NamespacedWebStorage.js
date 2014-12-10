@@ -1,23 +1,3 @@
-/*
- * NamespacedWebStorage.js
- *
- * https://github.com/monjudoh/NamespacedWebStorage.js
- * version: 0.0.2
- *
- * Copyright (c) 2013 monjudoh
- * Dual licensed under the MIT (MIT-LICENSE.txt)
- * and GPL (GPL-LICENSE.txt) licenses.
- */
-/**
- * @module NamespacedWebStorage
- * @version 0.0.2
- * @author monjudoh
- * @copyright (c) 2013 monjudoh<br/>
- * Dual licensed under the MIT (MIT-LICENSE.txt)<br/>
- * and GPL (GPL-LICENSE.txt) licenses.
- * @see https://github.com/monjudoh/NamespacedWebStorage.js
- * @see NamespacedWebStorage
- */
 define('NamespacedWebStorage',
 [],
 function () {
@@ -27,6 +7,13 @@ function () {
    * @param {Array.<string>=} restNamespaces
    * @param {Storage=} storage 保存先のStorage。デフォルトはlocalStorage
    * @constructor
+   *
+   * @version 0.0.3
+   * @author monjudoh
+   * @copyright <pre>(c) 2013 monjudoh
+   * Dual licensed under the MIT (MIT-LICENSE.txt)
+   * and GPL (GPL-LICENSE.txt) licenses.</pre>
+   * @see https://github.com/monjudoh/NamespacedWebStorage.js
    */
   function NamespacedWebStorage(primaryNamespace,restNamespaces,storage){
     var namespaces = (restNamespaces || []).slice();
@@ -40,7 +27,7 @@ function () {
   }
   /**
    * @name getItem
-   * @memberOf NamespacedWebStorage
+   * @memberOf NamespacedWebStorage#
    * @function
    *
    * @param {string} key
@@ -53,7 +40,7 @@ function () {
   };
   /**
    * @name setItem
-   * @memberOf NamespacedWebStorage
+   * @memberOf NamespacedWebStorage#
    * @function
    *
    * @param {string} key
@@ -70,7 +57,7 @@ function () {
   };
   /**
    * @name removeItem
-   * @memberOf NamespacedWebStorage
+   * @memberOf NamespacedWebStorage#
    * @function
    *
    * @param {string} key
@@ -82,7 +69,7 @@ function () {
   };
   /**
    * @name truncate
-   * @memberOf NamespacedWebStorage
+   * @memberOf NamespacedWebStorage#
    * @function
    *
    * @param {number} number 残す個数
