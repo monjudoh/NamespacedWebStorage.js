@@ -1,6 +1,8 @@
 define('NamespacedWebStorage',
 [],
 function () {
+
+  var internalProperty = 'NamespacedWebStorage:Internal';
   /**
    * @name NamespacedWebStorage
    * @param {string} primaryNamespace
@@ -18,12 +20,33 @@ function () {
   function NamespacedWebStorage(primaryNamespace,restNamespaces,storage){
     var namespaces = (restNamespaces || []).slice();
     namespaces.unshift(primaryNamespace);
+    Object.defineProperty(this,internalProperty,{
+      enumerable:false,
+      configurable:true,
+      writable:false,
+      value:Object.create(null)
+    });
     this.namespaces = namespaces;
     this.storage = storage || localStorage;
   }
+
+  /**
+   * @name NamespacedWebStorage:Internal
+   * @memberOf NamespacedWebStorage#
+   * @type {Object}
+   * @private
+   */
   var proto = NamespacedWebStorage.prototype;
   function key2FullKey(key){
     return this.namespaces.join('.') + '.' + key;
+  }
+  function fullKey2key(fullKey) {
+    var namespacePart = this.namespaces.join('.') + '.';
+    if (fullKey.indexOf(namespacePart) === 0) {
+      return fullKey.replace(namespacePart, '');
+    } else {
+      return null;
+    }
   }
   /**
    * @function hasItem
@@ -129,5 +152,59 @@ function () {
       });
     });
   };
+
+  /**
+   * @callback NamespacedWebStorage~onstorageCallback
+   * @param key {string} NamespacedWebStorageのkey
+   * @param ev {StorageEvent} originalのStorageEvent
+   */
+  /**
+   * @name onstorage
+   * @memberOf NamespacedWebStorage#
+   * @type NamespacedWebStorage~onstorageCallback=
+   * @description Storageに値が設定されNamespacedWebStorageの値が変わった際に通知する対象のcallbackを設定する
+   */
+  (function () {
+    var storages = [];
+    storages.includes = function includes(obj) {
+      return this.indexOf(obj) !== -1;
+    };
+    function evHandler(ev){
+      storages.forEach(function(storage){
+        var key = fullKey2key.call(storage,ev.key);
+        if (key !== null && ev.storageArea === storage.storage) {
+          (storage[internalProperty].onstorage).call(storage,key,ev);
+        }
+      });
+    }
+    function addRemoveEventListener(){
+      if (storages.length > 0) {
+        window.addEventListener('storage', evHandler, false);
+      } else {
+        window.removeEventListener('storage', evHandler, false);
+      }
+    }
+
+    Object.defineProperty(proto,'onstorage',{
+      get:function () {
+        return this[internalProperty].onstorage
+      },
+      set:function(handler) {
+        if (typeof handler === 'function') {
+          if (!storages.includes(this)) {
+            storages.push(this);
+          }
+          this[internalProperty].onstorage = handler;
+        } else if (handler === null || handler === undefined) {
+          if (storages.includes(this)) {
+            storages.splice(storages.indexOf(this),1);
+          }
+          this[internalProperty].onstorage = null;
+        }
+        addRemoveEventListener();
+      }
+    });
+  })();
+
   return NamespacedWebStorage;
 });
