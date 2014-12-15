@@ -169,10 +169,31 @@ function () {
     storages.includes = function includes(obj) {
       return this.indexOf(obj) !== -1;
     };
-    function evHandler(ev){
+    function evHandler(ev,fromPreviousEventLoop){
+      var isKeyEmpty = ev.key === null || ev.key === '';
+      var storageArea = ev.storageArea;
+
+      // IEで他windowでの変更によりStorageEventが発火した場合、storageAreaの当該keyのvalueが反映されていない。
+      // ので次event loopに飛ばす。
+      if (isKeyEmpty) {
+      } else if (ev.newValue && ev.newValue === storageArea[ev.key]) {
+      } else if (ev.newValue === '' &&  storageArea[ev.key] === undefined) {
+      } else {
+        if (!fromPreviousEventLoop) {
+          setTimeout(evHandler.bind(this, ev, true), 0);
+        }
+        return;
+      }
+      var isRemoved = ev.newValue === null || (ev.newValue === '' && storageArea[ev.key] === undefined);
+      var isCleared = isRemoved && (ev.oldValue === null || ev.oldValue === '') && isKeyEmpty;
+      var isNoChange = !isRemoved && ev.newValue === ev.oldValue;
+      // IEでは値の変更がなくてもStorageEventが発火するので変更がない場合はcallbackに渡さない
+      if (isNoChange) {
+        return;
+      }
       storages.forEach(function(storage){
         var key = fullKey2key.call(storage,ev.key);
-        if (key !== null && ev.storageArea === storage.storage) {
+        if (key !== null && storageArea === storage.storage) {
           (storage[internalProperty].onstorage).call(storage,key,ev);
         }
       });
