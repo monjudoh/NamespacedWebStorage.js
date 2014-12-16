@@ -264,15 +264,17 @@ function () {
 
       // IEで他windowでの変更によりStorageEventが発火した場合、storageAreaの当該keyのvalueが反映されていない。
       // ので次event loopに飛ばす。
-      if (isKeyEmpty) {
-      } else if (ev.newValue && ev.newValue === storageArea[ev.key]) {
-      } else if (ev.newValue === null) {
-      } else if (ev.newValue === '' &&  storageArea[ev.key] === undefined) {
-      } else {
-        if (!options.fromPreviousEventLoop) {
-          setTimeout(evHandler.bind(this, ev, {fromPreviousEventLoop:true}), 0);
+      if (isIE) {
+        if (isKeyEmpty) {
+        } else if (ev.newValue && ev.newValue === storageArea[ev.key]) {
+        } else if (ev.newValue === null) {
+        } else if (ev.newValue === '' && storageArea[ev.key] === undefined) {
+        } else {
+          if (!options.fromPreviousEventLoop) {
+            setTimeout(evHandler.bind(this, ev, {fromPreviousEventLoop: true}), 0);
+          }
+          return;
         }
-        return;
       }
       var isRemoved = ev.newValue === null || (ev.newValue === '' && storageArea[ev.key] === undefined);
       var isCleared = isRemoved && (ev.oldValue === null || ev.oldValue === '') && isKeyEmpty;
