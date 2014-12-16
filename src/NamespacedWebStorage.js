@@ -212,6 +212,7 @@ function () {
       // ので次event loopに飛ばす。
       if (isKeyEmpty) {
       } else if (ev.newValue && ev.newValue === storageArea[ev.key]) {
+      } else if (ev.newValue === null) {
       } else if (ev.newValue === '' &&  storageArea[ev.key] === undefined) {
       } else {
         if (!fromPreviousEventLoop) {
