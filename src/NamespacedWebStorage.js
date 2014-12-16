@@ -37,6 +37,35 @@ function () {
    * @private
    */
   var proto = NamespacedWebStorage.prototype;
+
+  /**
+   *
+   * @constructor NamespacedWebStorage~SetLike
+   * @description ES6 Setっぽいもの
+   * @private
+   */
+  function SetLike() {
+    var self = [];
+    self.has = function includes(value) {
+      return this.indexOf(value) !== -1;
+    };
+    self.add = function add(value) {
+      if (!self.has(value)) {
+        self.push(value);
+      }
+    };
+    self.delete = function deleteMethod(value) {
+      if (self.has(value)) {
+        self.splice(self.indexOf(this),1);
+      }
+    };
+    Object.defineProperty(self,'size',{
+      get:function get(){
+        return this.length;
+      }
+    });
+    return self;
+  }
   function key2FullKey(key){
     return this.namespaces.join('.') + '.' + key;
   }
@@ -170,10 +199,8 @@ function () {
    * @description Storageに値が設定されNamespacedWebStorageの値が変わった際に通知する対象のcallbackを設定する
    */
   (function () {
-    var storages = [];
-    storages.includes = function includes(obj) {
-      return this.indexOf(obj) !== -1;
-    };
+    // onstorageが設定されたNamespacedWebStorageのSet
+    var storages = new SetLike();
     function evHandler(ev,fromPreviousEventLoop){
       if (fromPreviousEventLoop === undefined) {
         fromPreviousEventLoop = false;
@@ -209,7 +236,7 @@ function () {
       }
     }
     function addRemoveEventListener(){
-      if (storages.length > 0) {
+      if (storages.size > 0) {
         window.addEventListener('storage', evHandler, false);
       } else {
         window.removeEventListener('storage', evHandler, false);
@@ -222,14 +249,10 @@ function () {
       },
       set:function(handler) {
         if (typeof handler === 'function') {
-          if (!storages.includes(this)) {
-            storages.push(this);
-          }
+          storages.add(this);
           this[internalProperty].onstorage = handler;
         } else if (handler === null || handler === undefined) {
-          if (storages.includes(this)) {
-            storages.splice(storages.indexOf(this),1);
-          }
+          storages.remove(this);
           this[internalProperty].onstorage = null;
         }
         addRemoveEventListener();
