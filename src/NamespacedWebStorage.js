@@ -160,8 +160,8 @@ function () {
   /**
    * @callback NamespacedWebStorage~onstorageCallback
    * @param key {string} NamespacedWebStorageのkey
-   * @param ev {StorageEvent} originalのStorageEvent
    * @param addition {NamespacedWebStorage~OnstorageCallback_Addition}
+   * @param ev {StorageEvent=} originalのStorageEvent。debug用。
    */
   /**
    * @name onstorage
@@ -203,7 +203,7 @@ function () {
         storages.forEach(function (storage) {
           var key = fullKey2key.call(storage, ev.key);
           if (key !== null && storageArea === storage.storage) {
-            (storage[internalProperty].onstorage).call(storage, key, ev, {isRemoved: isRemoved});
+            (storage[internalProperty].onstorage).call(storage, key, {isRemoved: isRemoved}, ev);
           }
         });
       }
