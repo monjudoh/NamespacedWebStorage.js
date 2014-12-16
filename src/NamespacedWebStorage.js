@@ -154,9 +154,14 @@ function () {
   };
 
   /**
+   * @typedef NamespacedWebStorage~OnstorageCallback_Addition
+   * @property {boolean} isRemoved 当該keyが削除されたらtrue
+   */
+  /**
    * @callback NamespacedWebStorage~onstorageCallback
    * @param key {string} NamespacedWebStorageのkey
    * @param ev {StorageEvent} originalのStorageEvent
+   * @param addition {NamespacedWebStorage~OnstorageCallback_Addition}
    */
   /**
    * @name onstorage
@@ -170,6 +175,9 @@ function () {
       return this.indexOf(obj) !== -1;
     };
     function evHandler(ev,fromPreviousEventLoop){
+      if (fromPreviousEventLoop === undefined) {
+        fromPreviousEventLoop = false;
+      }
       var isKeyEmpty = ev.key === null || ev.key === '';
       var storageArea = ev.storageArea;
 
@@ -191,12 +199,14 @@ function () {
       if (isNoChange) {
         return;
       }
-      storages.forEach(function(storage){
-        var key = fullKey2key.call(storage,ev.key);
-        if (key !== null && storageArea === storage.storage) {
-          (storage[internalProperty].onstorage).call(storage,key,ev);
-        }
-      });
+      if (!isCleared) {
+        storages.forEach(function (storage) {
+          var key = fullKey2key.call(storage, ev.key);
+          if (key !== null && storageArea === storage.storage) {
+            (storage[internalProperty].onstorage).call(storage, key, ev, {isRemoved: isRemoved});
+          }
+        });
+      }
     }
     function addRemoveEventListener(){
       if (storages.length > 0) {
