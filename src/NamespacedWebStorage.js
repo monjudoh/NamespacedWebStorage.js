@@ -108,7 +108,7 @@ function () {
     var ev = document.createEvent('StorageEvent');
     ev.initStorageEvent('storage',false,false,key,oldValue,newValue,location.href,storageArea);
     storageEventListenerSet.forEach(function(eventListener){
-      eventListener.call(window,ev);
+      eventListener.call(window,ev,{fromOtherWindow:false});
     })
   }
   /**
@@ -236,6 +236,7 @@ function () {
   /**
    * @typedef NamespacedWebStorage~OnstorageCallback_Addition
    * @property {boolean} isRemoved 当該keyが削除されたらtrue
+   * @property {boolean} fromOtherWindow 別windowでの変更由来ならtrue
    */
   /**
    * @callback NamespacedWebStorage~onstorageCallback
@@ -254,7 +255,8 @@ function () {
     var storages = new SetLike();
     function optionsDefaults (options) {
       return defaults(options,{
-        fromPreviousEventLoop:false
+        fromPreviousEventLoop:false,
+        fromOtherWindow:!isIE
       });
     }
     function evHandler(ev,options){
@@ -267,11 +269,10 @@ function () {
       if (isIE) {
         if (isKeyEmpty) {
         } else if (ev.newValue && ev.newValue === storageArea[ev.key]) {
-        } else if (ev.newValue === null) {
         } else if (ev.newValue === '' && storageArea[ev.key] === undefined) {
         } else {
           if (!options.fromPreviousEventLoop) {
-            setTimeout(evHandler.bind(this, ev, {fromPreviousEventLoop: true}), 0);
+            setTimeout(evHandler.bind(this, ev, {fromPreviousEventLoop: true,fromOtherWindow:true}), 0);
           }
           return;
         }
@@ -287,7 +288,11 @@ function () {
         storages.forEach(function (storage) {
           var key = fullKey2key.call(storage, ev.key);
           if (key !== null && storageArea === storage.storage) {
-            (storage[internalProperty].onstorage).call(storage, key, {isRemoved: isRemoved}, ev);
+            var addition = {
+              isRemoved: isRemoved,
+              fromOtherWindow: options.fromOtherWindow
+            };
+            (storage[internalProperty].onstorage).call(storage, key, addition, ev);
           }
         });
       }
