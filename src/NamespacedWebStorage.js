@@ -77,6 +77,22 @@ function () {
       return null;
     }
   }
+  // このmoduleでwindowに設定されたstorage eventのリスナのSet
+  var storageEventListenerSet = new SetLike();
+
+  function notifyStorageEvent(storageArea,key,oldValue,newValue){
+    if (storageEventListenerSet.size === 0) {
+      return;
+    }
+    if (oldValue === undefined) {
+      oldValue = null;
+    }
+    var ev = document.createEvent('StorageEvent');
+    ev.initStorageEvent('storage',false,false,key,oldValue,newValue,location.href,storageArea);
+    storageEventListenerSet.forEach(function(eventListener){
+      eventListener.call(window,ev);
+    })
+  }
   /**
    * @function hasItem
    * @memberOf NamespacedWebStorage#
@@ -119,12 +135,17 @@ function () {
    * @description インスタンスのnamespace階層配下にてkeyに対応する値を設定する。生のWebStorageと違い文字列型以外も扱える。
    */
   proto.setItem = function setItem(key,data){
+    var storageArea = this.storage;
     var fullKey = key2FullKey.call(this,key);
     var json = JSON.stringify({
       value:data,
       timestamp:Date.now()
     });
-    this.storage[fullKey] = json;
+
+    var oldValue;
+    oldValue = storageArea.getItem(fullKey);
+    storageArea.setItem(fullKey,json);
+    notifyStorageEvent(storageArea,fullKey,oldValue,json);
   };
   /**
    * @function removeItem
@@ -134,8 +155,12 @@ function () {
    * @description インスタンスのnamespace階層配下にてkeyに対応する値を削除する。
    */
   proto.removeItem = function removeItem(key) {
+    var storageArea = this.storage;
     var fullKey = key2FullKey.call(this,key);
-    delete this.storage[fullKey];
+    var oldValue;
+    oldValue = storageArea.getItem(fullKey);
+    storageArea.removeItem(fullKey);
+    notifyStorageEvent(storageArea,fullKey,oldValue,null);
   };
   /**
    * @function truncate
@@ -239,8 +264,10 @@ function () {
     function addRemoveEventListener(){
       if (storages.size > 0) {
         window.addEventListener('storage', evHandler, false);
+        storageEventListenerSet.add(evHandler);
       } else {
         window.removeEventListener('storage', evHandler, false);
+        storageEventListenerSet.delete(evHandler);
       }
     }
 
