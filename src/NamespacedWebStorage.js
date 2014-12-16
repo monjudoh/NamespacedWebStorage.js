@@ -37,6 +37,7 @@ function () {
    * @private
    */
   var proto = NamespacedWebStorage.prototype;
+  var isIE = navigator.userAgent.indexOf('compatible; MSIE') !== -1 || navigator.userAgent.indexOf('Trident/') !== -1;
 
   /**
    * @function NamespacedWebStorage~defaults
@@ -160,9 +161,13 @@ function () {
     });
 
     var oldValue;
-    oldValue = storageArea.getItem(fullKey);
+    if (!isIE) {
+      oldValue = storageArea.getItem(fullKey);
+    }
     storageArea.setItem(fullKey,json);
-    notifyStorageEvent(storageArea,fullKey,oldValue,json);
+    if (!isIE) {
+      notifyStorageEvent(storageArea, fullKey, oldValue, json);
+    }
   };
   /**
    * @function removeItem
@@ -175,9 +180,13 @@ function () {
     var storageArea = this.storage;
     var fullKey = key2FullKey.call(this,key);
     var oldValue;
-    oldValue = storageArea.getItem(fullKey);
+    if (!isIE) {
+      oldValue = storageArea.getItem(fullKey);
+    }
     storageArea.removeItem(fullKey);
-    notifyStorageEvent(storageArea,fullKey,oldValue,null);
+    if (!isIE) {
+      notifyStorageEvent(storageArea, fullKey, oldValue, null);
+    }
   };
   /**
    * @function truncate
