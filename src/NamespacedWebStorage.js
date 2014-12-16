@@ -39,6 +39,23 @@ function () {
   var proto = NamespacedWebStorage.prototype;
 
   /**
+   * @function NamespacedWebStorage~defaults
+   * @returns {object}
+   * @description 非破壊版_.defaults
+   * @private
+   */
+  function defaults() {
+    var obj = Object.create(null);
+    Array.prototype.slice.call(arguments).forEach(function(source){
+      for (var prop in source) {
+        if (obj[prop] == null) {
+          obj[prop] = source[prop];
+        }
+      }
+    });
+    return obj;
+  }
+  /**
    *
    * @constructor NamespacedWebStorage~SetLike
    * @description ES6 Setっぽいもの
@@ -226,10 +243,13 @@ function () {
   (function () {
     // onstorageが設定されたNamespacedWebStorageのSet
     var storages = new SetLike();
-    function evHandler(ev,fromPreviousEventLoop){
-      if (fromPreviousEventLoop === undefined) {
-        fromPreviousEventLoop = false;
-      }
+    function optionsDefaults (options) {
+      return defaults(options,{
+        fromPreviousEventLoop:false
+      });
+    }
+    function evHandler(ev,options){
+      options = optionsDefaults(options);
       var isKeyEmpty = ev.key === null || ev.key === '';
       var storageArea = ev.storageArea;
 
@@ -240,8 +260,8 @@ function () {
       } else if (ev.newValue === null) {
       } else if (ev.newValue === '' &&  storageArea[ev.key] === undefined) {
       } else {
-        if (!fromPreviousEventLoop) {
-          setTimeout(evHandler.bind(this, ev, true), 0);
+        if (!options.fromPreviousEventLoop) {
+          setTimeout(evHandler.bind(this, ev, {fromPreviousEventLoop:true}), 0);
         }
         return;
       }
