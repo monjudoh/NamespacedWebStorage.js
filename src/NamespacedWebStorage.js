@@ -27,7 +27,7 @@ function () {
       value:Object.create(null)
     });
     this.namespaces = namespaces;
-    this.storage = storage || localStorage;
+    this[internalProperty].storageArea = storage || localStorage;
   }
 
   /**
@@ -126,10 +126,11 @@ function () {
    */
   proto.hasItem = function hasItem(key){
     var fullKey = key2FullKey.call(this,key);
-    if (this.storage instanceof Storage) {
-      return fullKey in this.storage;
+    var storageArea = this[internalProperty].storageArea;
+    if (storageArea instanceof Storage) {
+      return fullKey in storageArea;
     } else {
-      return this.storage.hasItem(fullKey);
+      return storageArea.hasItem(fullKey);
     }
   };
   /**
@@ -142,7 +143,8 @@ function () {
    */
   proto.getItem = function getItem(key){
     var fullKey = key2FullKey.call(this,key);
-    return JSON.parse((this.storage[fullKey] || '{}')).value;
+    var storageArea = this[internalProperty].storageArea;
+    return JSON.parse((storageArea[fullKey] || '{}')).value;
   };
   /**
    * @function setItem
@@ -153,7 +155,7 @@ function () {
    * @description インスタンスのnamespace階層配下にてkeyに対応する値を設定する。生のWebStorageと違い文字列型以外も扱える。
    */
   proto.setItem = function setItem(key,data){
-    var storageArea = this.storage;
+    var storageArea = this[internalProperty].storageArea;
     var fullKey = key2FullKey.call(this,key);
     var json = JSON.stringify({
       value:data,
@@ -177,7 +179,7 @@ function () {
    * @description インスタンスのnamespace階層配下にてkeyに対応する値を削除する。
    */
   proto.removeItem = function removeItem(key) {
-    var storageArea = this.storage;
+    var storageArea = this[internalProperty].storageArea;
     var fullKey = key2FullKey.call(this,key);
     var oldValue;
     if (!isIE) {
@@ -199,7 +201,7 @@ function () {
   proto.truncate = function truncate(number,level) {
     level = level !== undefined ? level : 1;
     var keyPrefix = this.namespaces.slice(0,level).join('.') + '.';
-    var storageArea = this.storage;
+    var storageArea = this[internalProperty].storageArea;
     var keys = Object.keys(storageArea).filter(function(key){
       return key.indexOf(keyPrefix) === 0;
     });
