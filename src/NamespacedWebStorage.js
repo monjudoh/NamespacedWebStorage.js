@@ -142,9 +142,17 @@ function () {
    * @description インスタンスのnamespace階層配下にてkeyに対応する値を取得する
    */
   proto.getItem = function getItem(key){
+    if (!this.hasItem(key)) {
+      return null;
+    }
     var fullKey = key2FullKey.call(this,key);
     var storageArea = this[internalProperty].storageArea;
-    return JSON.parse((storageArea[fullKey] || '{}')).value;
+    var json = storageArea.getItem(fullKey);
+    try {
+      return JSON.parse(json).value;
+    } catch (e) {
+      return null;
+    }
   };
   /**
    * @function setItem
