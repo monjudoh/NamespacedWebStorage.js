@@ -26,7 +26,7 @@ function () {
       writable:false,
       value:Object.create(null)
     });
-    this.namespaces = namespaces;
+    this[internalProperty].namespaces = namespaces;
     this[internalProperty].storageArea = storage || localStorage;
   }
 
@@ -85,10 +85,10 @@ function () {
     return self;
   }
   function key2FullKey(key){
-    return this.namespaces.join('.') + '.' + key;
+    return this[internalProperty].namespaces.join('.') + '.' + key;
   }
   function fullKey2key(fullKey) {
-    var namespacePart = this.namespaces.join('.') + '.';
+    var namespacePart = this[internalProperty].namespaces.join('.') + '.';
     if (fullKey.indexOf(namespacePart) === 0) {
       return fullKey.replace(namespacePart, '');
     } else {
@@ -200,7 +200,7 @@ function () {
    */
   proto.truncate = function truncate(number,level) {
     level = level !== undefined ? level : 1;
-    var keyPrefix = this.namespaces.slice(0,level).join('.') + '.';
+    var keyPrefix = this[internalProperty].namespaces.slice(0,level).join('.') + '.';
     var storageArea = this[internalProperty].storageArea;
     var keys = Object.keys(storageArea).filter(function(key){
       return key.indexOf(keyPrefix) === 0;
