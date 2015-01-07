@@ -199,8 +199,8 @@ function () {
   proto.truncate = function truncate(number,level) {
     level = level !== undefined ? level : 1;
     var keyPrefix = this.namespaces.slice(0,level).join('.') + '.';
-    var storage = this.storage;
-    var keys = Object.keys(storage).filter(function(key){
+    var storageArea = this.storage;
+    var keys = Object.keys(storageArea).filter(function(key){
       return key.indexOf(keyPrefix) === 0;
     });
     var namespace2keys = Object.create(null);
@@ -215,7 +215,7 @@ function () {
     var namespace2latestTimestamp = Object.create(null);
     namespaces.forEach(function(namespace){
       var timestamps = namespace2keys[namespace].map(function(key){
-        return JSON.parse(storage[key]).timestamp;
+        return JSON.parse(storageArea[key]).timestamp;
       });
       timestamps.push(0);
       timestamps.push(0);
@@ -227,8 +227,15 @@ function () {
     });
     var namespaces4truncate = namespaces.slice(number);
     namespaces4truncate.forEach(function(namespace){
-      namespace2keys[namespace].forEach(function(key){
-        delete storage[key];
+      namespace2keys[namespace].forEach(function(fullKey){
+        var oldValue;
+        if (!isIE) {
+          oldValue = storageArea.getItem(fullKey);
+        }
+        storageArea.removeItem(fullKey);
+        if (!isIE) {
+          notifyStorageEvent(storageArea, fullKey, oldValue, null);
+        }
       });
     });
   };
