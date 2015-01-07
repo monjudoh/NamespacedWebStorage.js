@@ -10,7 +10,7 @@ function () {
    * @param {Storage=} storage 保存先のStorage。デフォルトはlocalStorage
    * @constructor
    *
-   * @version 0.0.3
+   * @version 0.1.0
    * @author monjudoh
    * @copyright <pre>(c) 2013 monjudoh
    * Dual licensed under the MIT (MIT-LICENSE.txt)
