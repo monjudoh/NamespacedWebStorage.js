@@ -304,7 +304,7 @@ function () {
       if (!isCleared) {
         storages.forEach(function (storage) {
           var key = fullKey2key.call(storage, ev.key);
-          if (key !== null && storageArea === storage.storage) {
+          if (key !== null && storageArea === storage[internalProperty].storageArea) {
             var addition = {
               isRemoved: isRemoved,
               fromOtherWindow: options.fromOtherWindow
