@@ -155,6 +155,27 @@ function () {
     }
   };
   /**
+   * @function getTimestamp
+   * @memberOf NamespacedWebStorage#
+   *
+   * @param {string} key
+   * @returns {number?}
+   * @description インスタンスのnamespace階層配下にて当該keyの最終更新日時(UTC)を取得する
+   */
+  proto.getTimestamp = function getTimestamp(key){
+    if (!this.hasItem(key)) {
+      return null;
+    }
+    var fullKey = key2FullKey.call(this,key);
+    var storageArea = this[internalProperty].storageArea;
+    var json = storageArea.getItem(fullKey);
+    try {
+      return JSON.parse(json).timestamp;
+    } catch (e) {
+      return null;
+    }
+  };
+  /**
    * @function setItem
    * @memberOf NamespacedWebStorage#
    *
