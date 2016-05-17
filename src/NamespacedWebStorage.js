@@ -1,7 +1,7 @@
 define('NamespacedWebStorage',
 [],
 function () {
-
+  "use strict";
   var internalProperty = 'NamespacedWebStorage:Internal';
   /**
    * @name NamespacedWebStorage
@@ -111,6 +111,24 @@ function () {
       eventListener.call(window,ev,{fromOtherWindow:false});
     })
   }
+
+  /**
+   * @name length
+   * @memberOf NamespacedWebStorage#
+   * @type number
+   * @readonly
+   * @description 当該namespace階層配下でのdataの個数
+   */
+  Object.defineProperty(proto,'length',{
+    get:function(){
+      var keyPrefix = this[internalProperty].namespaces.join('.') + '.';
+      var storageArea = this[internalProperty].storageArea;
+      var keys = Object.keys(storageArea).filter(function(key){
+        return key.indexOf(keyPrefix) === 0;
+      });
+      return keys.length;
+    }
+  });
   /**
    * @function hasItem
    * @memberOf NamespacedWebStorage#
