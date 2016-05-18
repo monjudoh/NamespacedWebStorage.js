@@ -16,6 +16,7 @@
   "scripts": {
     "docs" : "jsdoc -r src/ -d docs/",
     "docs:clean" : "rm -rf docs",
-    "docs-inner" : "jsdoc -r src/ -d docs-inner/"
+    "docs-inner" : "jsdoc -r src/ -d docs-inner/",
+    "rst2md" : "pandoc README.rst -s -o README.md"
   }
 }
