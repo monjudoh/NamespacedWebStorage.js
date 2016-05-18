@@ -1,7 +1,7 @@
 define('NamespacedWebStorage',
 [],
 function () {
-
+  "use strict";
   var internalProperty = 'NamespacedWebStorage:Internal';
   /**
    * @name NamespacedWebStorage
@@ -10,7 +10,7 @@ function () {
    * @param {Storage=} storage 保存先のStorage。デフォルトはlocalStorage
    * @constructor
    *
-   * @version 0.1.0
+   * @version 0.3.0
    * @author monjudoh
    * @copyright <pre>(c) 2013 monjudoh
    * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -111,6 +111,48 @@ function () {
       eventListener.call(window,ev,{fromOtherWindow:false});
     })
   }
+
+  /**
+   * @name length
+   * @memberOf NamespacedWebStorage#
+   * @type number
+   * @readonly
+   * @description 当該namespace階層配下でのdataの個数
+   */
+  Object.defineProperty(proto,'length',{
+    get:function(){
+      var keyPrefix = this[internalProperty].namespaces.join('.') + '.';
+      var storageArea = this[internalProperty].storageArea;
+      var keys = Object.keys(storageArea).filter(function(key){
+        return key.indexOf(keyPrefix) === 0;
+      });
+      return keys.length;
+    }
+  });
+  /**
+   * @function key
+   * @memberOf NamespacedWebStorage#
+   * @param {number} index
+   * @returns {string} 当該namespace階層配下でのkey
+   */
+  proto.key = function key(index) {
+    var keyPrefix = this[internalProperty].namespaces.join('.') + '.';
+    var storageArea = this[internalProperty].storageArea;
+    var currentIndex = 0;
+    var fullKey = null;
+    var length = storageArea.length;
+    for (var i = 0; i < length; i++) {
+      fullKey = storageArea.key(i);
+      if (fullKey.indexOf(keyPrefix) !== 0) {
+        continue;
+      }
+      if (currentIndex === index) {
+        return fullKey2key.call(this,fullKey);
+      }
+      currentIndex++;
+    }
+    return null;
+  };
   /**
    * @function hasItem
    * @memberOf NamespacedWebStorage#
@@ -150,6 +192,27 @@ function () {
     var json = storageArea.getItem(fullKey);
     try {
       return JSON.parse(json).value;
+    } catch (e) {
+      return null;
+    }
+  };
+  /**
+   * @function getTimestamp
+   * @memberOf NamespacedWebStorage#
+   *
+   * @param {string} key
+   * @returns {number?}
+   * @description インスタンスのnamespace階層配下にて当該keyの最終更新日時(UTC)を取得する
+   */
+  proto.getTimestamp = function getTimestamp(key){
+    if (!this.hasItem(key)) {
+      return null;
+    }
+    var fullKey = key2FullKey.call(this,key);
+    var storageArea = this[internalProperty].storageArea;
+    var json = storageArea.getItem(fullKey);
+    try {
+      return JSON.parse(json).timestamp;
     } catch (e) {
       return null;
     }
