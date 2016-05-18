@@ -130,6 +130,30 @@ function () {
     }
   });
   /**
+   * @function key
+   * @memberOf NamespacedWebStorage#
+   * @param {number} index
+   * @returns {string} 当該namespace階層配下でのkey
+   */
+  proto.key = function key(index) {
+    var keyPrefix = this[internalProperty].namespaces.join('.') + '.';
+    var storageArea = this[internalProperty].storageArea;
+    var currentIndex = 0;
+    var fullKey = null;
+    var length = storageArea.length;
+    for (var i = 0; i < length; i++) {
+      fullKey = storageArea.key(i);
+      if (fullKey.indexOf(keyPrefix) !== 0) {
+        continue;
+      }
+      if (currentIndex === index) {
+        return fullKey2key.call(this,fullKey);
+      }
+      currentIndex++;
+    }
+    return null;
+  };
+  /**
    * @function hasItem
    * @memberOf NamespacedWebStorage#
    *
